@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "186397595811",
+    "firebase_url": "https://hotelmanagement-b9061-default-rtdb.firebaseio.com",
+    "project_id": "hotelmanagement-b9061",
+    "storage_bucket": "hotelmanagement-b9061.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:186397595811:android:437118221691d8f22cc716",
+        "android_client_info": {
+          "package_name": "com.example.hotelmanagement"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1F-O74GBlFSFvDfVEejgiWTYky0Chw7Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
