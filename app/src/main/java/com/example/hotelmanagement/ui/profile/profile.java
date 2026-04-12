@@ -13,13 +13,18 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.hotelmanagement.R;
+import com.example.hotelmanagement.ui.admin.AdminActivity;
 import com.example.hotelmanagement.ui.login.login;
+import com.example.hotelmanagement.ui.payment.PaymentActivity;
+import com.example.hotelmanagement.ui.review.ReviewActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class profile extends AppCompatActivity {
     private TextView txtName, txtEmail, txtPhone, txtRole;
     private Button btnLogout;
+
+    Button btnReview, btnPayment, btnDashboard;
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -45,6 +50,22 @@ public class profile extends AppCompatActivity {
         loadUser();
 
         btnLogout.setOnClickListener(v -> logout());
+
+        Button btnReview = findViewById(R.id.btnReview);
+        Button btnPayment = findViewById(R.id.btnPayment);
+        Button btnDashboard = findViewById(R.id.btnDashboard);
+
+        btnReview.setOnClickListener(v -> {
+            startActivity(new Intent(this, ReviewActivity.class));
+        });
+
+        btnPayment.setOnClickListener(v -> {
+            startActivity(new Intent(this, PaymentActivity.class));
+        });
+
+        btnDashboard.setOnClickListener(v -> {
+            startActivity(new Intent(this, AdminActivity.class));
+        });
     }
     private void loadUser() {
         String uid = auth.getCurrentUser().getUid();
