@@ -2,6 +2,7 @@ package com.example.hotelmanagement.adapter;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.hotelmanagement.R;
 import com.example.hotelmanagement.model.Review;
 import com.example.hotelmanagement.model.Trip;
@@ -31,11 +31,20 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
     private List<Trip> tripList;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
+    private OnTripStatusChangeListener statusChangeListener;
+
+    public interface OnTripStatusChangeListener {
+        void onStatusChanged();
+    }
 
     public TripAdapter(List<Trip> tripList) {
         this.tripList = tripList;
         this.db = FirebaseFirestore.getInstance();
         this.auth = FirebaseAuth.getInstance();
+    }
+
+    public void setOnTripStatusChangeListener(OnTripStatusChangeListener listener) {
+        this.statusChangeListener = listener;
     }
 
     @NonNull
@@ -49,53 +58,35 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
     public void onBindViewHolder(@NonNull TripViewHolder holder, int position) {
         Trip trip = tripList.get(position);
         
-        // 1. Hiển thị thông tin cơ bản
-        holder.txtId.setVisibility(View.GONE); // Ẩn TextView hiển thị Booking ID
+        holder.txtId.setVisibility(View.GONE);
         holder.txtDates.setText(trip.getDates());
         holder.txtStatus.setText(trip.getStatus());
         holder.txtPrice.setText("$" + trip.getTotal_price() + " Total");
         
-        // Ẩn/Hiện nút Write Review dựa trên trạng thái
-        if (trip.getStatus() != null && trip.getStatus().equalsIgnoreCase("UPCOMING")) {
-            holder.btnWriteReview.setVisibility(View.GONE);
-        } else {
-            holder.btnWriteReview.setVisibility(View.VISIBLE);
+        // Logic hiển thị nút và màu sắc status
+        if (trip.getStatus() != null) {
+            String status = trip.getStatus();
+            if (status.equalsIgnoreCase("UPCOMING")) {
+                holder.btnCancelTrip.setVisibility(View.VISIBLE);
+                holder.btnWriteReview.setVisibility(View.GONE);
+                holder.txtStatus.setTextColor(Color.parseColor("#2E7D32")); // Green
+            } else if (status.equalsIgnoreCase("COMPLETED")) {
+                holder.btnCancelTrip.setVisibility(View.GONE);
+                holder.btnWriteReview.setVisibility(View.VISIBLE);
+                holder.txtStatus.setTextColor(Color.parseColor("#2E7D32")); // Green
+            } else if (status.equalsIgnoreCase("CANCELLED")) {
+                holder.btnCancelTrip.setVisibility(View.GONE);
+                holder.btnWriteReview.setVisibility(View.GONE);
+                holder.txtStatus.setTextColor(Color.RED); // Set màu đỏ cho status CANCELLED
+            }
         }
 
+        holder.btnCancelTrip.setOnClickListener(v -> showCancelConfirmation(v, trip));
         holder.btnWriteReview.setOnClickListener(v -> showReviewDialog(holder.itemView, trip));
 
-        // Trạng thái mặc định khi đang tải
-        holder.txtName.setText("Loading...");
-        holder.imgRoom.setImageResource(R.drawable.room1);
-
-        // 2. Lấy tên và ảnh từ bảng rooms dựa trên hotel_id
+        // Load ảnh từ drawable
         if (trip.getHotel_id() != null) {
-            db.collection("rooms")
-                    .whereEqualTo("hotel_id", trip.getHotel_id())
-                    .get()
-                    .addOnSuccessListener(queryDocumentSnapshots -> {
-                        if (!queryDocumentSnapshots.isEmpty()) {
-                            com.google.firebase.firestore.DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
-                            String hotelName = document.getString("hotel_name");
-                            String imageUrl = document.getString("imageUrl");
-
-                            // Hiển thị tên phòng thực tế
-                            holder.txtName.setText(hotelName != null ? hotelName : "Hotel Name N/A");
-                            
-                            // Hiển thị ảnh thực tế
-                            if (imageUrl != null && !imageUrl.isEmpty()) {
-                                Glide.with(holder.itemView.getContext())
-                                        .load(imageUrl)
-                                        .placeholder(R.drawable.room1)
-                                        .into(holder.imgRoom);
-                            }
-                        } else {
-                            holder.txtName.setText("Hotel ID: " + trip.getHotel_id());
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        holder.txtName.setText("Error loading room");
-                    });
+            loadHotelInfo(holder, trip);
         }
 
         holder.itemView.setOnClickListener(v -> {
@@ -105,75 +96,82 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
         });
     }
 
+    private void loadHotelInfo(TripViewHolder holder, Trip trip) {
+        holder.txtName.setText("Loading...");
+        db.collection("rooms")
+                .whereEqualTo("hotel_id", trip.getHotel_id())
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        com.google.firebase.firestore.DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
+                        holder.txtName.setText(document.getString("hotel_name"));
+                        String imgName = document.getString("imageUrl");
+                        if (imgName != null) {
+                            int resId = holder.itemView.getContext().getResources().getIdentifier(imgName, "drawable", holder.itemView.getContext().getPackageName());
+                            holder.imgRoom.setImageResource(resId != 0 ? resId : R.drawable.room1);
+                        }
+                    }
+                });
+    }
+
+    private void showCancelConfirmation(View view, Trip trip) {
+        new AlertDialog.Builder(view.getContext())
+                .setTitle("Cancel Booking")
+                .setMessage("Are you sure you want to cancel this booking?")
+                .setPositiveButton("Yes, Cancel", (dialog, which) -> cancelBooking(view, trip))
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    private void cancelBooking(View view, Trip trip) {
+        if (trip.getId() == null) return;
+
+        db.collection("bookings").document(trip.getId())
+                .update("status", "CANCELLED")
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(view.getContext(), "Booking cancelled", Toast.LENGTH_SHORT).show();
+                    if (statusChangeListener != null) statusChangeListener.onStatusChanged();
+                })
+                .addOnFailureListener(e -> Toast.makeText(view.getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
     private void showReviewDialog(View view, Trip trip) {
         AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
         View dialogView = LayoutInflater.from(view.getContext()).inflate(R.layout.dialog_write_review, null);
         builder.setView(dialogView);
-
         AlertDialog dialog = builder.create();
 
         RatingBar ratingBar = dialogView.findViewById(R.id.ratingBar);
         EditText edtComment = dialogView.findViewById(R.id.edtComment);
-        Button btnCancel = dialogView.findViewById(R.id.btnCancel);
         Button btnSubmit = dialogView.findViewById(R.id.btnSubmitReview);
 
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        dialogView.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
 
         btnSubmit.setOnClickListener(v -> {
             int rating = (int) ratingBar.getRating();
             String comment = edtComment.getText().toString().trim();
-
-            if (rating == 0) {
-                Toast.makeText(view.getContext(), "Please select a rating", Toast.LENGTH_SHORT).show();
-                return;
+            if (rating > 0 && !comment.isEmpty()) {
+                saveReview(view, trip, rating, comment, dialog);
             }
-
-            if (comment.isEmpty()) {
-                edtComment.setError("Please enter a comment");
-                return;
-            }
-
-            saveReview(view, trip, rating, comment, dialog);
         });
-
         dialog.show();
     }
 
     private void saveReview(View view, Trip trip, int rating, String comment, AlertDialog dialog) {
-        if (auth.getCurrentUser() == null) {
-            Toast.makeText(view.getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Tạo review object
-        Review review = new Review(
-                comment,
-                rating,
-                Timestamp.now(), // create_at
-                trip.getUser_id(), // Lấy user_id từ trip
-                trip.getHotel_id()
-        );
-
-        db.collection("reviews")
-                .add(review)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(view.getContext(), "Review submitted successfully!", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(view.getContext(), "Failed to submit review: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+        Review review = new Review(comment, rating, Timestamp.now(), trip.getUser_id(), trip.getHotel_id());
+        db.collection("reviews").add(review).addOnSuccessListener(doc -> {
+            Toast.makeText(view.getContext(), "Review submitted!", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
     }
 
     @Override
-    public int getItemCount() {
-        return tripList.size();
-    }
+    public int getItemCount() { return tripList.size(); }
 
     public static class TripViewHolder extends RecyclerView.ViewHolder {
         ImageView imgRoom;
         TextView txtName, txtId, txtDates, txtStatus, txtPrice;
-        Button btnWriteReview;
+        Button btnWriteReview, btnCancelTrip;
 
         public TripViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -184,6 +182,7 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
             txtStatus = itemView.findViewById(R.id.txtTripStatus);
             txtPrice = itemView.findViewById(R.id.txtTripPrice);
             btnWriteReview = itemView.findViewById(R.id.btnWriteReview);
+            btnCancelTrip = itemView.findViewById(R.id.btnCancelTrip);
         }
     }
 }

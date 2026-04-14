@@ -68,13 +68,7 @@ public class profile extends AppCompatActivity {
     }
     private void loadUser() {
         FirebaseUser currentUser = auth.getCurrentUser();
-        if (currentUser == null) {
-            txtName.setText("Name: Guest");
-            txtEmail.setText("Email: guest@example.com");
-            txtPhone.setText("Phone: 0000000000");
-            txtRole.setText("Guest");
-            return;
-        }
+
         String uid = currentUser.getUid();
 
         db.collection("users")
