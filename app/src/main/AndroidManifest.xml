@@ -30,6 +30,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.review.ReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.payment.PaymentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

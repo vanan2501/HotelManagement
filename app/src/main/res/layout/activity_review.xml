@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Đánh giá khách sạn"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
+
+    <RatingBar
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/ratingBar"
+        android:numStars="5"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/edtComment"
+        android:hint="Nhập nhận xét"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/btnSubmit"
+        android:text="Gửi đánh giá"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/rvReview"/>
+
+
+</LinearLayout>
