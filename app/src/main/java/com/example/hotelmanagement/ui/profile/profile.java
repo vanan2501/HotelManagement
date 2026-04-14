@@ -13,11 +13,16 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.hotelmanagement.R;
+import com.example.hotelmanagement.ui.explore.ExploreRoomsActivity;
+import com.example.hotelmanagement.ui.login.login;
+import com.example.hotelmanagement.ui.trips.MyTripsActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.example.hotelmanagement.ui.admin.AdminActivity;
 import com.example.hotelmanagement.ui.login.login;
 import com.example.hotelmanagement.ui.payment.PaymentActivity;
 import com.example.hotelmanagement.ui.review.ReviewActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class profile extends AppCompatActivity {
@@ -32,7 +37,7 @@ public class profile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_profile_with_nav);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -51,6 +56,20 @@ public class profile extends AppCompatActivity {
 
         btnLogout.setOnClickListener(v -> logout());
 
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setSelectedItemId(R.id.nav_profile);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(this, ExploreRoomsActivity.class));
+                return true;
+            } else if (id == R.id.nav_trips) {
+                startActivity(new Intent(this, MyTripsActivity.class));
+                return true;
+            } else if (id == R.id.nav_profile) {
+                return true;
+            }
+            return false;
         Button btnReview = findViewById(R.id.btnReview);
         Button btnPayment = findViewById(R.id.btnPayment);
         Button btnDashboard = findViewById(R.id.btnDashboard);
@@ -68,7 +87,15 @@ public class profile extends AppCompatActivity {
         });
     }
     private void loadUser() {
-        String uid = auth.getCurrentUser().getUid();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            txtName.setText("Name: Guest");
+            txtEmail.setText("Email: guest@example.com");
+            txtPhone.setText("Phone: 0000000000");
+            txtRole.setText("Guest");
+            return;
+        }
+        String uid = currentUser.getUid();
 
         db.collection("users")
                 .document(uid)
@@ -83,7 +110,7 @@ public class profile extends AppCompatActivity {
                         txtName.setText("Name: " + name);
                         txtEmail.setText("Email: " + email);
                         txtPhone.setText("Phone: " + phone);
-                        if(role == 1){
+                        if(role != null && role == 1){
                             txtRole.setText("Admin");
                         } else {
                             txtRole.setText("User");
