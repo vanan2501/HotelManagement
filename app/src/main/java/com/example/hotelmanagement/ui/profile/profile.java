@@ -17,10 +17,6 @@ import com.example.hotelmanagement.ui.explore.ExploreRoomsActivity;
 import com.example.hotelmanagement.ui.login.login;
 import com.example.hotelmanagement.ui.trips.MyTripsActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.example.hotelmanagement.ui.admin.AdminActivity;
-import com.example.hotelmanagement.ui.login.login;
-import com.example.hotelmanagement.ui.payment.PaymentActivity;
-import com.example.hotelmanagement.ui.review.ReviewActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -28,9 +24,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class profile extends AppCompatActivity {
     private TextView txtName, txtEmail, txtPhone, txtRole;
     private Button btnLogout;
-
-    Button btnReview, btnPayment, btnDashboard;
-
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     @Override
@@ -70,23 +63,10 @@ public class profile extends AppCompatActivity {
                 return true;
             }
             return false;
-        Button btnReview = findViewById(R.id.btnReview);
-        Button btnPayment = findViewById(R.id.btnPayment);
-        Button btnDashboard = findViewById(R.id.btnDashboard);
 
-        btnReview.setOnClickListener(v -> {
-            startActivity(new Intent(this, ReviewActivity.class));
-        });
-
-        btnPayment.setOnClickListener(v -> {
-            startActivity(new Intent(this, PaymentActivity.class));
-        });
-
-        btnDashboard.setOnClickListener(v -> {
-            startActivity(new Intent(this, AdminActivity.class));
         });
     }
-    private void loadUser() {
+        private void loadUser() {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
             txtName.setText("Name: Guest");
@@ -121,10 +101,10 @@ public class profile extends AppCompatActivity {
                     Toast.makeText(this, "Lỗi load dữ liệu", Toast.LENGTH_SHORT).show();
                 });
     }
-    private void logout() {
-        FirebaseAuth.getInstance().signOut();
+        private void logout() {
+            FirebaseAuth.getInstance().signOut();
 
-        startActivity(new Intent(this, login.class));
-        finish();
-    }
+            startActivity(new Intent(this, login.class));
+            finish();
+        }
 }
