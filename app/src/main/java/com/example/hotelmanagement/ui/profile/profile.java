@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.hotelmanagement.R;
 import com.example.hotelmanagement.ui.explore.ExploreRoomsActivity;
 import com.example.hotelmanagement.ui.login.login;
+import com.example.hotelmanagement.ui.room.RoomActivity;
 import com.example.hotelmanagement.ui.trips.MyTripsActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,7 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class profile extends AppCompatActivity {
     private TextView txtName, txtEmail, txtPhone, txtRole;
-    private Button btnLogout;
+    private Button btnLogout, btnAddRoom;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     @Override
@@ -64,6 +65,20 @@ public class profile extends AppCompatActivity {
             }
             return false;
 
+        });
+
+        btnAddRoom = findViewById(R.id.btnAddRoom);
+
+        btnAddRoom.setOnClickListener(v -> {
+            String role = txtRole.getText().toString();
+
+            if (!"Admin".equals(txtRole)) {
+                Toast.makeText(this, "Chỉ Admin được thêm phòng", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent intent = new Intent(this, RoomActivity.class);
+            startActivity(intent);
         });
     }
         private void loadUser() {

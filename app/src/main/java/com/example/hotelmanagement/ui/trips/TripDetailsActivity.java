@@ -49,6 +49,8 @@ public class TripDetailsActivity extends AppCompatActivity {
             TextView txtDates = findViewById(R.id.txtDates);
             TextView txtStatus = findViewById(R.id.txtStatus);
             TextView txtPrice = findViewById(R.id.txtPrice);
+            TextView txtPaymentMethod = findViewById(R.id.txtPaymentMethod);
+            TextView txtPaymentStatus = findViewById(R.id.txtPaymentStatus);
             TextView txtSpecialRequests = findViewById(R.id.txtSpecialRequests);
 
             txtGuestName = findViewById(R.id.txtGuestName);
@@ -73,6 +75,9 @@ public class TripDetailsActivity extends AppCompatActivity {
             txtDates.setText("Dates: " + trip.getDates());
             txtStatus.setText("Status: " + trip.getStatus());
             txtPrice.setText("Total Paid: $" + trip.getTotal_price());
+
+            txtPaymentMethod.setText("Payment: " + trip.getPayment_method());
+            txtPaymentStatus.setText("Status: " + trip.getPayment_status());
 
             String specialReq = trip.getSpecial_request();
             txtSpecialRequests.setText("Special Requests: " + (specialReq != null && !specialReq.isEmpty() ? specialReq : "None"));

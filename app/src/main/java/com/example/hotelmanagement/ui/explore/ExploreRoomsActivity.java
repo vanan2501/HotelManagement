@@ -66,22 +66,31 @@ public class ExploreRoomsActivity extends AppCompatActivity {
 
     private void loadRoomsFromFirestore() {
         db.collection("rooms")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
+                .addSnapshotListener((value, error) -> {
+
+                    if (error != null) {
+                        Toast.makeText(this,
+                                "Error: " + error.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     roomList.clear();
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+
+                    for (QueryDocumentSnapshot document : value) {
+
                         Room room = document.toObject(Room.class);
                         room.setId(document.getId());
                         roomList.add(room);
                     }
+
                     adapter.notifyDataSetChanged();
-                    
+
                     if (roomList.isEmpty()) {
-                        Toast.makeText(this, "No rooms found in Firestore", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this,
+                                "No rooms found in Firestore",
+                                Toast.LENGTH_SHORT).show();
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error loading rooms: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }

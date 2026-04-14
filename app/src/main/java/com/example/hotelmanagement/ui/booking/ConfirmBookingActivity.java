@@ -20,6 +20,7 @@ import com.example.hotelmanagement.adapter.ReviewAdapter;
 import com.example.hotelmanagement.model.Review;
 import com.example.hotelmanagement.model.Room;
 import com.example.hotelmanagement.model.Trip;
+import com.example.hotelmanagement.ui.payment.PaymentActivity;
 import com.example.hotelmanagement.ui.trips.MyTripsActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -215,9 +216,10 @@ public class ConfirmBookingActivity extends AppCompatActivity {
             db.collection("bookings")
                     .add(newTrip)
                     .addOnSuccessListener(documentReference -> {
-                        Toast.makeText(this, "Booking Confirmed!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(this, MyTripsActivity.class);
+                        //Toast.makeText(this, "Booking Confirmed!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(this, PaymentActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("trip_data", newTrip);
                         startActivity(intent);
                         finish();
                     })

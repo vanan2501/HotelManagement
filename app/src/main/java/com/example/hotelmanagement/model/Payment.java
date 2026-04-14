@@ -1,4 +1,4 @@
-package com.example.hotelmanagement.data.model;
+package com.example.hotelmanagement.model;
 
 public class Payment {
     public int id;

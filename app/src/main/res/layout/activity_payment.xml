@@ -1,43 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <TextView
+    <!-- HEADER -->
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Payment"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#000"/>
+    </RelativeLayout>
+
+    <!-- CONTENT -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Thanh toán"
-        android:textSize="20sp"/>
+        android:layout_weight="1"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintBottom_toTopOf="@id/btnPay">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/txtAmount"
-        android:text="Số tiền: 0 VND"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/spMethod"/>
+            <!-- BOOKING SUMMARY -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Booking Summary"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#000"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtRoomName"
+                        android:layout_marginTop="8dp"
+                        android:text="Room Name"
+                        android:textColor="#333"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtDates"
+                        android:text="Dates"
+                        android:textColor="#666"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtTotal"
+                        android:layout_marginTop="4dp"
+                        android:text="$300"
+                        android:textStyle="bold"
+                        android:textColor="#000"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- PAYMENT METHOD -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Select Payment Method"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="#000"/>
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <!-- MOMO -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout
+                        android:padding="12dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            android:id="@+id/rbMomo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="MoMo E-Wallet (Fake)"
+                            android:textColor="#000"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- CASH -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:padding="12dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            android:id="@+id/rbCash"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pay at Hotel (Cash)"
+                            android:textColor="#000"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </RadioGroup>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- PAY BUTTON -->
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:id="@+id/btnPay"
-        android:text="Thanh toán"/>
-
-    <Button
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/btnMomo"
-        android:text="Thanh toán Momo"/>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/btnVNPay"
-        android:text="Thanh toán VNPay"/>
+        android:layout_height="56dp"
+        android:layout_margin="16dp"
+        android:text="Pay"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#2E7D32"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </LinearLayout>

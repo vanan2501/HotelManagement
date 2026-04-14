@@ -54,13 +54,6 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
         holder.txtDates.setText(trip.getDates());
         holder.txtStatus.setText(trip.getStatus());
         holder.txtPrice.setText("$" + trip.getTotal_price() + " Total");
-        
-        // Ẩn/Hiện nút Write Review dựa trên trạng thái
-        if (trip.getStatus() != null && trip.getStatus().equalsIgnoreCase("UPCOMING")) {
-            holder.btnWriteReview.setVisibility(View.GONE);
-        } else {
-            holder.btnWriteReview.setVisibility(View.VISIBLE);
-        }
 
         holder.btnWriteReview.setOnClickListener(v -> showReviewDialog(holder.itemView, trip));
 
@@ -75,7 +68,8 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         if (!queryDocumentSnapshots.isEmpty()) {
-                            com.google.firebase.firestore.DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
+                            com.google.firebase.firestore.DocumentSnapshot
+                                    document = queryDocumentSnapshots.getDocuments().get(0);
                             String hotelName = document.getString("hotel_name");
                             String imageUrl = document.getString("imageUrl");
 
@@ -103,6 +97,12 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
             intent.putExtra("trip_data", trip);
             v.getContext().startActivity(intent);
         });
+
+        //3. Hiển thị thông tin thanh toán và button Review
+        if ("PAID".equalsIgnoreCase(trip.getPayment_status())) {
+            holder.btnWriteReview.setVisibility(View.VISIBLE);
+        }
+        else { holder.btnWriteReview.setVisibility(View.GONE); }
     }
 
     private void showReviewDialog(View view, Trip trip) {

@@ -13,7 +13,8 @@ public class Trip implements Serializable {
     private String status;
     private double total_price;
     private String user_id;
-
+    private String payment_method;
+    private String payment_status;
     public Trip() {
         // Required for Firebase
     }
@@ -69,4 +70,16 @@ public class Trip implements Serializable {
 
     @Exclude
     public String getDates() { return checkin_date + " - " + checkout_date; }
+
+    @PropertyName("payment_method")
+    public String getPayment_method() { return payment_method; }
+
+    @PropertyName("payment_method")
+    public void setPayment_method(String payment_method) { this.payment_method = payment_method; }
+
+    @PropertyName("payment_status")
+    public String getPayment_status() { return payment_status; }
+
+    @PropertyName("payment_status")
+    public void setPayment_status(String payment_status) { this.payment_status = payment_status; }
 }

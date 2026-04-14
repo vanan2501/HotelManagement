@@ -54,6 +54,14 @@
             android:text="Role"
             android:textSize="18sp" />
 
+        <!-- Add room -->
+        <Button
+            android:id="@+id/btnAddRoom"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Add Room"
+            android:layout_marginTop="30dp"/>
+
         <!-- LOGOUT -->
         <Button
             android:id="@+id/btnLogout"
