@@ -13,7 +13,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.hotelmanagement.R;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Date;
@@ -21,7 +27,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class register extends AppCompatActivity {
-    private EditText edtName, edtPhone, edtEmail, edtPassword, edtConfirm;
+    private EditText edtName;
+    private EditText edtPhone;
+    private EditText edtEmail;
+    private EditText edtPassword;
+    private EditText edtConfirm;
     private Button btnRegister;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -36,6 +46,7 @@ public class register extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         edtName = findViewById(R.id.edtName);
         edtPhone = findViewById(R.id.edtPhone);
         edtEmail = findViewById(R.id.edtEmail);
@@ -48,6 +59,7 @@ public class register extends AppCompatActivity {
 
         btnRegister.setOnClickListener(v -> register());
     }
+
     private void register() {
         String name = edtName.getText().toString().trim();
         String phone = edtPhone.getText().toString().trim();
@@ -55,53 +67,51 @@ public class register extends AppCompatActivity {
         String password = edtPassword.getText().toString().trim();
         String confirm = edtConfirm.getText().toString().trim();
 
-        // NAME
-        if(name.isEmpty()){
-            edtName.setError("Nhập tên");
+        if (name.isEmpty()) {
+            edtName.setError("Nhap ten");
             return;
         }
 
-// PHONE
-        if(phone.isEmpty()){
-            edtPhone.setError("Nhập số điện thoại");
+        if (phone.isEmpty()) {
+            edtPhone.setError("Nhap so dien thoai");
             return;
         }
 
-        if(!phone.matches("^0[0-9]{9}$")){
-            edtPhone.setError("SĐT không hợp lệ");
+        if (!phone.matches("^0[0-9]{9}$")) {
+            edtPhone.setError("SDT khong hop le");
             return;
         }
 
-// EMAIL
-        if(email.isEmpty()){
-            edtEmail.setError("Nhập email");
+        if (email.isEmpty()) {
+            edtEmail.setError("Nhap email");
             return;
         }
 
-        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-            edtEmail.setError("Email không hợp lệ");
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            edtEmail.setError("Email khong hop le");
             return;
         }
 
-// PASSWORD
-        if(password.length() < 6){
-            edtPassword.setError("Password >= 6 ký tự");
+        if (password.length() < 6) {
+            edtPassword.setError("Password phai co it nhat 6 ky tu");
             return;
         }
 
-// CONFIRM
-        if(!password.equals(confirm)) {
-            edtConfirm.setError("Mật khẩu không khớp");
+        if (!password.equals(confirm)) {
+            edtConfirm.setError("Mat khau khong khop");
             return;
         }
-        // 🔐 Firebase Auth
+
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()){
+                    if (task.isSuccessful()) {
+                        FirebaseUser currentUser = auth.getCurrentUser();
+                        if (currentUser == null) {
+                            Toast.makeText(this, "Dang ky that bai, vui long thu lai", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                        String uid = auth.getCurrentUser().getUid();
-
-                        // 📦 data Firestore
+                        String uid = currentUser.getUid();
                         Map<String, Object> user = new HashMap<>();
                         user.put("name", name);
                         user.put("phone", phone);
@@ -113,13 +123,34 @@ public class register extends AppCompatActivity {
                                 .document(uid)
                                 .set(user)
                                 .addOnSuccessListener(unused -> {
-                                    Toast.makeText(this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(this, "Dang ky thanh cong", Toast.LENGTH_SHORT).show();
                                     finish();
+                                })
+                                .addOnFailureListener(e -> {
+                                    currentUser.delete();
+                                    Toast.makeText(this, "Tao auth thanh cong nhung luu users that bai", Toast.LENGTH_LONG).show();
                                 });
-
                     } else {
-                        Toast.makeText(this, "Email đã tồn tại", Toast.LENGTH_SHORT).show();
+                        showRegisterError(task.getException());
                     }
                 });
+    }
+
+    private void showRegisterError(Exception exception) {
+        String message = "Dang ky that bai";
+        if (exception instanceof FirebaseAuthUserCollisionException) {
+            message = "Email da ton tai trong Firebase Authentication";
+        } else if (exception instanceof FirebaseAuthWeakPasswordException) {
+            message = "Mat khau qua yeu";
+        } else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
+            message = "Email khong hop le";
+        } else if (exception instanceof FirebaseNetworkException) {
+            message = "Loi mang, khong ket noi duoc Firebase";
+        } else if (exception instanceof FirebaseAuthException) {
+            message = "Auth error: " + ((FirebaseAuthException) exception).getErrorCode();
+        } else if (exception != null && exception.getMessage() != null) {
+            message = exception.getMessage();
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }
