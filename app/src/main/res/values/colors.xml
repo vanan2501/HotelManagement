@@ -2,4 +2,15 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="home_screen_bg">#E9EDF7</color>
+    <color name="home_title_primary">#1F1B2D</color>
+    <color name="home_title_muted">#5B5867</color>
+    <color name="home_hint">#9A98A6</color>
+    <color name="home_link">#A19DA8</color>
+    <color name="home_card_bg">#FDFCFB</color>
+    <color name="home_chip_bg">#F8F7F4</color>
+    <color name="home_chip_icon">#4C4856</color>
+    <color name="home_price">#24201F</color>
+    <color name="home_accent">#FFB644</color>
+    <color name="home_nav_inactive">#8D8B97</color>
 </resources>

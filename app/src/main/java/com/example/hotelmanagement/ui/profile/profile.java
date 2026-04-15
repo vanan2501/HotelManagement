@@ -29,7 +29,7 @@ public class profile extends AppCompatActivity {
     private TextView txtName, txtEmail, txtPhone, txtRole;
     private Button btnLogout;
 
-    Button btnReview, btnPayment, btnDashboard;
+//    Button btnReview, btnPayment, btnDashboard;
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -59,32 +59,33 @@ public class profile extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setSelectedItemId(R.id.nav_profile);
         bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                startActivity(new Intent(this, ExploreRoomsActivity.class));
-                return true;
-            } else if (id == R.id.nav_trips) {
-                startActivity(new Intent(this, MyTripsActivity.class));
-                return true;
-            } else if (id == R.id.nav_profile) {
-                return true;
-            }
-            return false;
-        Button btnReview = findViewById(R.id.btnReview);
-        Button btnPayment = findViewById(R.id.btnPayment);
-        Button btnDashboard = findViewById(R.id.btnDashboard);
+                    int id = item.getItemId();
+                    if (id == R.id.nav_home) {
+                        startActivity(new Intent(this, ExploreRoomsActivity.class));
+                        return true;
+                    } else if (id == R.id.nav_trips) {
+                        startActivity(new Intent(this, MyTripsActivity.class));
+                        return true;
+                    } else if (id == R.id.nav_profile) {
+                        return true;
+                    }
+                    return false;
+                });
+//        Button btnReview = findViewById(R.id.btnReview);
+//        Button btnPayment = findViewById(R.id.btnPayment);
+//        Button btnDashboard = findViewById(R.id.btnDashboard);
 
-        btnReview.setOnClickListener(v -> {
-            startActivity(new Intent(this, ReviewActivity.class));
-        });
-
-        btnPayment.setOnClickListener(v -> {
-            startActivity(new Intent(this, PaymentActivity.class));
-        });
-
-        btnDashboard.setOnClickListener(v -> {
-            startActivity(new Intent(this, AdminActivity.class));
-        });
+//        btnReview.setOnClickListener(v -> {
+//            startActivity(new Intent(this, ReviewActivity.class));
+//        });
+//
+//        btnPayment.setOnClickListener(v -> {
+//            startActivity(new Intent(this, PaymentActivity.class));
+//        });
+//
+//        btnDashboard.setOnClickListener(v -> {
+//            startActivity(new Intent(this, AdminActivity.class));
+//        });
     }
     private void loadUser() {
         FirebaseUser currentUser = auth.getCurrentUser();
