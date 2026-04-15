@@ -1,59 +1,59 @@
 package com.example.hotelmanagement.ui.payment;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hotelmanagement.R;
-import com.example.hotelmanagement.data.api.ApiClient;
-import com.example.hotelmanagement.data.model.Payment;
-import com.example.hotelmanagement.ui.review.ReviewActivity;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.example.hotelmanagement.model.Trip;
+import com.example.hotelmanagement.ui.trips.MyTripsActivity;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class PaymentActivity extends AppCompatActivity {
-    Button btnPay;
 
+    RadioButton rbMomo, rbCash;
+    Button btnPay;
+    FirebaseFirestore db;
+    Trip trip;
 
     @Override
-    protected void onCreate(Bundle saveInstanceState) {
-        super.onCreate(saveInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
 
+        db = FirebaseFirestore.getInstance();
+
+        rbMomo = findViewById(R.id.rbMomo);
+        rbCash = findViewById(R.id.rbCash);
         btnPay = findViewById(R.id.btnPay);
 
-//        int bookingId = getIntent().getIntExtra("booking_id",1);
-//        double amount = getIntent().getDoubleExtra("amount",500000);
+        trip = (Trip) getIntent().getSerializableExtra("trip_data");
 
-        btnPay.setOnClickListener(v -> {
-            Payment payment = new Payment();
-            payment.amount=500000;
-            payment.method="momo";
+        btnPay.setOnClickListener(v -> handlePayment());
+    }
 
-            ApiClient.getApiService().createPayment(payment)
-                    .enqueue(new Callback<Payment>() {
-                        @Override
-                        public void onResponse(Call<Payment> call, Response<Payment> response) {
-                            Toast.makeText(PaymentActivity.this,"Thanh toán thành công",
-                                    Toast.LENGTH_SHORT).show();
-                        }
+    private void handlePayment() {
 
-                        @Override
-                        public void onFailure(Call<Payment> call, Throwable t) {
-                            Toast.makeText(PaymentActivity.this,"Không thể gửi review.",
-                                    Toast.LENGTH_SHORT).show();
-                            Log.e("Pay Error",t.getMessage());
-                        }
-                    });
+        if (trip == null) return;
 
-        });
+        String method = rbMomo.isChecked() ? "MOMO" : "CASH";
+        String status = rbMomo.isChecked() ? "PAID" : "UNPAID";
 
+        trip.setPayment_method(method);
+        trip.setPayment_status(status);
 
+        db.collection("bookings")
+                .add(trip)
+                .addOnSuccessListener(doc -> {
+                    Toast.makeText(this, "Payment Success", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, MyTripsActivity.class));
+                    finish();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Fail", Toast.LENGTH_SHORT).show());
     }
 }

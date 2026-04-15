@@ -1,38 +1,52 @@
 package com.example.hotelmanagement.ui.admin;
 
-import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hotelmanagement.R;
-import com.example.hotelmanagement.viewmodel.AdminViewModel;
+import com.example.hotelmanagement.adapter.RoomAdapter;
+import com.example.hotelmanagement.model.Room;
+import com.example.hotelmanagement.ui.room.RoomActivity;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AdminActivity extends AppCompatActivity {
-    TextView txtUsers, txtBookings, txtRevenue;
-    @SuppressLint("MissingInflatedId")
+    TextView txtUser, txtRoom;
+    Button btnUser, btnRoom;
+
+    FirebaseFirestore db;
+
     @Override
-    protected void onCreate(Bundle saveInstanceState){
-        super.onCreate(saveInstanceState);
-        setContentView(R.layout.activity_admin);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_admin_dashboard);
 
-        txtUsers = findViewById(R.id.txtUsers);
-        txtBookings = findViewById(R.id.txtBookings);
-        txtRevenue = findViewById(R.id.txtRevenue);
+        txtUser = findViewById(R.id.txtUser);
+        txtRoom = findViewById(R.id.txtRoom);
+        btnUser = findViewById(R.id.btnUser);
+        btnRoom = findViewById(R.id.btnRoom);
 
-        AdminViewModel viewModel = new ViewModelProvider(this)
-                .get(AdminViewModel.class);
-         viewModel.getDashboard().observe(this,data -> {
-             txtUsers.setText("Users: " + data.totalUsers);
-             txtBookings.setText("Bookings: " + data.totalBookings);
-             txtRevenue.setText("Revenue: " + data.totalRevenue);
-         });
+        db = FirebaseFirestore.getInstance();
 
-         viewModel.loadDashboard();
+        loadStats();
 
 
+        btnRoom.setOnClickListener(v ->
+                startActivity(new Intent(this, RoomActivity.class)));
+    }
+
+    private void loadStats() {
+        db.collection("rooms").get()
+                .addOnSuccessListener(task ->
+                        txtRoom.setText("Rooms: " + task.size()));
     }
 }

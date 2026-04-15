@@ -86,6 +86,33 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
 
         // Load ảnh từ drawable
         if (trip.getHotel_id() != null) {
+            db.collection("rooms")
+                    .whereEqualTo("hotel_id", trip.getHotel_id())
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            com.google.firebase.firestore.DocumentSnapshot
+                                    document = queryDocumentSnapshots.getDocuments().get(0);
+                            String hotelName = document.getString("hotel_name");
+                            String imageUrl = document.getString("imageUrl");
+
+                            // Hiển thị tên phòng thực tế
+                            holder.txtName.setText(hotelName != null ? hotelName : "Hotel Name N/A");
+                            
+                            // Hiển thị ảnh thực tế
+                            if (imageUrl != null && !imageUrl.isEmpty()) {
+                                Glide.with(holder.itemView.getContext())
+                                        .load(imageUrl)
+                                        .placeholder(R.drawable.room1)
+                                        .into(holder.imgRoom);
+                            }
+                        } else {
+                            holder.txtName.setText("Hotel ID: " + trip.getHotel_id());
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        holder.txtName.setText("Error loading room");
+                    });
             loadHotelInfo(holder, trip);
         }
 
@@ -94,6 +121,12 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
             intent.putExtra("trip_data", trip);
             v.getContext().startActivity(intent);
         });
+
+        //3. Hiển thị thông tin thanh toán và button Review
+        if ("PAID".equalsIgnoreCase(trip.getPayment_status())) {
+            holder.btnWriteReview.setVisibility(View.VISIBLE);
+        }
+        else { holder.btnWriteReview.setVisibility(View.GONE); }
     }
 
     private void loadHotelInfo(TripViewHolder holder, Trip trip) {

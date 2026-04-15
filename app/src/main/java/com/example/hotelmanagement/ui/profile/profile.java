@@ -15,22 +15,16 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.hotelmanagement.R;
 import com.example.hotelmanagement.ui.explore.ExploreRoomsActivity;
 import com.example.hotelmanagement.ui.login.login;
+import com.example.hotelmanagement.ui.room.RoomActivity;
 import com.example.hotelmanagement.ui.trips.MyTripsActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.example.hotelmanagement.ui.admin.AdminActivity;
-import com.example.hotelmanagement.ui.login.login;
-import com.example.hotelmanagement.ui.payment.PaymentActivity;
-import com.example.hotelmanagement.ui.review.ReviewActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class profile extends AppCompatActivity {
     private TextView txtName, txtEmail, txtPhone, txtRole;
-    private Button btnLogout;
-
-//    Button btnReview, btnPayment, btnDashboard;
-
+    private Button btnLogout, btnAddRoom;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     @Override
@@ -59,35 +53,35 @@ public class profile extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setSelectedItemId(R.id.nav_profile);
         bottomNav.setOnItemSelectedListener(item -> {
-                    int id = item.getItemId();
-                    if (id == R.id.nav_home) {
-                        startActivity(new Intent(this, ExploreRoomsActivity.class));
-                        return true;
-                    } else if (id == R.id.nav_trips) {
-                        startActivity(new Intent(this, MyTripsActivity.class));
-                        return true;
-                    } else if (id == R.id.nav_profile) {
-                        return true;
-                    }
-                    return false;
-                });
-//        Button btnReview = findViewById(R.id.btnReview);
-//        Button btnPayment = findViewById(R.id.btnPayment);
-//        Button btnDashboard = findViewById(R.id.btnDashboard);
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(this, ExploreRoomsActivity.class));
+                return true;
+            } else if (id == R.id.nav_trips) {
+                startActivity(new Intent(this, MyTripsActivity.class));
+                return true;
+            } else if (id == R.id.nav_profile) {
+                return true;
+            }
+            return false;
 
-//        btnReview.setOnClickListener(v -> {
-//            startActivity(new Intent(this, ReviewActivity.class));
-//        });
-//
-//        btnPayment.setOnClickListener(v -> {
-//            startActivity(new Intent(this, PaymentActivity.class));
-//        });
-//
-//        btnDashboard.setOnClickListener(v -> {
-//            startActivity(new Intent(this, AdminActivity.class));
-//        });
+        });
+
+        btnAddRoom = findViewById(R.id.btnAddRoom);
+
+        btnAddRoom.setOnClickListener(v -> {
+            String role = txtRole.getText().toString();
+
+            if (!"Admin".equals(txtRole)) {
+                Toast.makeText(this, "Chỉ Admin được thêm phòng", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent intent = new Intent(this, RoomActivity.class);
+            startActivity(intent);
+        });
     }
-    private void loadUser() {
+        private void loadUser() {
         FirebaseUser currentUser = auth.getCurrentUser();
 
         String uid = currentUser.getUid();
@@ -116,10 +110,10 @@ public class profile extends AppCompatActivity {
                     Toast.makeText(this, "Lỗi load dữ liệu", Toast.LENGTH_SHORT).show();
                 });
     }
-    private void logout() {
-        FirebaseAuth.getInstance().signOut();
+        private void logout() {
+            FirebaseAuth.getInstance().signOut();
 
-        startActivity(new Intent(this, login.class));
-        finish();
-    }
+            startActivity(new Intent(this, login.class));
+            finish();
+        }
 }

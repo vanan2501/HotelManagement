@@ -12,6 +12,7 @@ public class Review implements Serializable {
     private String user_id;
     private String hotel_id;
 
+
     public Review() {
         // Required for Firebase
     }
@@ -79,4 +80,6 @@ public class Review implements Serializable {
     public void setHotel_id(String hotel_id) {
         this.hotel_id = hotel_id;
     }
+
+
 }
