@@ -41,6 +41,7 @@ public class MyTripsActivity extends AppCompatActivity {
         filteredTrips = new ArrayList<>();
         
         adapter = new TripAdapter(filteredTrips);
+        adapter.setOnTripStatusChangeListener(this::loadBookings); // Reload khi cancel thành công
         rvTrips.setAdapter(adapter);
 
         loadBookings();
@@ -48,7 +49,7 @@ public class MyTripsActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                filterByStatus(tab.getPosition() == 0 ? "UPCOMING" : "COMPLETED");
+                updateFilter();
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {}
@@ -74,13 +75,20 @@ public class MyTripsActivity extends AppCompatActivity {
         });
     }
 
+    private void updateFilter() {
+        int pos = tabLayout.getSelectedTabPosition();
+        if (pos == 0) filterByStatus("UPCOMING");
+        else if (pos == 1) filterByStatus("COMPLETED");
+        else filterByStatus("CANCELLED");
+    }
+
     private void loadBookings() {
         BookingManager.getInstance().fetchBookings(new BookingManager.OnBookingsLoadedListener() {
             @Override
             public void onSuccess(List<Trip> tripList) {
                 allTrips.clear();
                 allTrips.addAll(tripList);
-                filterByStatus(tabLayout.getSelectedTabPosition() == 0 ? "UPCOMING" : "COMPLETED");
+                updateFilter();
             }
 
             @Override

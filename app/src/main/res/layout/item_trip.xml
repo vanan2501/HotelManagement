@@ -81,6 +81,19 @@
                     android:textStyle="bold" />
 
                 <Button
+                    android:id="@+id/btnCancelTrip"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="4dp"
+                    android:paddingHorizontal="8dp"
+                    android:text="Cancel"
+                    android:textAllCaps="false"
+                    android:textColor="#B71C1C"
+                    app:strokeColor="#B71C1C"
+                    android:textSize="10sp" />
+
+                <Button
                     android:id="@+id/btnWriteReview"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
